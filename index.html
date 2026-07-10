@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>호텔 예약 시스템 - 테이블 레이아웃 에디터</title>
+  
+  <!-- JointJS CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jointjs/3.7.7/joint.min.css" />
+  
+  <!-- TOAST UI DatePicker CSS -->
+  <link rel="stylesheet" href="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.css" />
+  
+  <!-- FullCalendar v5 CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" />
+  
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="logo-section">
+      <h1>LuxeStay</h1>
+      <p>Table Layout Editor v1.0.0</p>
+    </div>
+    <div>
+      <!-- 상단에 로고나 현재 세션 정보 등 장식적인 요소 배치 가능 -->
+    </div>
+  </header>
+
+  <!-- Main Layout -->
+  <div class="main-container">
+    
+    <!-- Sidebar (Toolbar) -->
+    <aside class="sidebar">
+        <!-- 예약 일자 선택 (TOAST UI DatePicker) -->
+        <div style="margin-bottom: 1.5rem; position: relative;">
+          <h2 class="section-title">예약 일자 선택</h2>
+          <div class="tui-datepicker-input tui-datetime-input tui-has-focus" style="width: 100%; border: 1px solid var(--border-color); background: rgba(255,255,255,0.02); border-radius: 8px; padding: 0.5rem 0.85rem; height: auto; display: flex; align-items: center; justify-content: space-between;">
+            <input type="text" id="datepicker-input" aria-label="Date-Time" style="background: transparent; border: none; color: #fff; font-family: 'Inter', sans-serif; font-size: 0.9rem; outline: none; width: 100%;" readonly>
+            <span class="tui-ico-date" style="color: var(--accent-cyan); font-size: 1.2rem; cursor: pointer;"></span>
+          </div>
+          <div id="datepicker-wrapper" style="margin-top: 5px; z-index: 1000; position: absolute; left: 0; width: 100%;"></div>
+        </div>
+
+        <!-- 예약 일자 (구버전) (FullCalendar v5) -->
+        <div style="margin-bottom: 1.5rem; position: relative;">
+          <h2 class="section-title">예약 일자 (구버전)</h2>
+          <div id="old-datepicker-input-group" style="width: 100%; border: 1px solid var(--border-color); background: rgba(255,255,255,0.02); border-radius: 8px; padding: 0.5rem 0.85rem; height: auto; display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+            <input type="text" id="old-datepicker-input" style="background: transparent; border: none; color: #fff; font-family: 'Inter', sans-serif; font-size: 0.9rem; outline: none; width: 100%; cursor: pointer;" readonly>
+            <span style="color: var(--accent-cyan); font-size: 1.1rem; cursor: pointer;">📅</span>
+          </div>
+          <div id="calendar-old-wrapper" style="display: none; margin-top: 5px; z-index: 1000; position: absolute; left: 0; width: 100%;">
+            <div id="calendar-old"></div>
+          </div>
+        </div>
+
+        <h2 class="section-title">도형 추가</h2>
+        <div class="tool-group">
+          <!-- 사각형 추가 버튼 -->
+          <button id="add-rect" class="btn btn-cyan">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6z"></path>
+            </svg>
+            사각형 추가
+          </button>
+          
+          <!-- 원형 추가 버튼 -->
+          <button id="add-circle" class="btn btn-purple">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="2"></circle>
+            </svg>
+            원형 추가
+          </button>
+          
+          <!-- 삼각형 추가 버튼 -->
+          <button id="add-triangle" class="btn btn-emerald">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4l8 16H4L12 4z"></path>
+            </svg>
+            삼각형 추가
+          </button>
+
+          <!-- 마름모 추가 버튼 -->
+          <button id="add-diamond" class="btn btn-cyan">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3l8 9-8 9-8-9 8-9z"></path>
+            </svg>
+            마름모 추가
+          </button>
+        </div>
+
+
+      <!-- Save Button & Layout List -->
+      <div style="margin-top: auto; display: flex; flex-direction: column; gap: 1rem;">
+        <!-- Saved Layouts List Container -->
+        <div id="saved-layouts-container" style="display: none;">
+          <h2 class="section-title" style="margin-bottom: 0.5rem;">저장된 레이아웃 목록</h2>
+          <div id="saved-layouts-list" class="saved-layouts-list">
+            <!-- Dynamically populated rows -->
+          </div>
+        </div>
+
+        <button id="save-layout" class="btn btn-emerald" style="width: 100%; justify-content: center;">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
+          </svg>
+          레이아웃 저장
+        </button>
+
+        <!-- Quick Tips -->
+        <div class="tips-box">
+          <div class="tips-header" id="tips-toggle-btn" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none;">
+            <strong>💡 도움말</strong>
+            <span class="tips-toggle-icon" style="font-size: 0.75rem; transition: transform 0.2s;">▼</span>
+          </div>
+          <ul id="tips-content" style="margin-top: 0.5rem; display: block; padding-left: 0; margin-bottom: 0;">
+            <li>도형을 클릭하면 <strong>조작 테두리</strong>가 나타납니다.</li>
+            <li>도형을 드래그하여 배치합니다.</li>
+            <li>도형을 <strong>더블 클릭</strong>하면 상세 정보 및 우선순위(Z) 편집 팝업이 뜹니다.</li>
+            <li>빈 영역 드래그 또는 Shift+클릭 후 <strong>그룹화(🔗)</strong>가 가능합니다.</li>
+            <li>그룹 도형 선택 시 오버레이의 <strong>그룹 해제(🔓)</strong> 단추로 해제합니다.</li>
+            <li>우상단 <strong>X</strong> 버튼으로 도형을 삭제합니다.</li>
+            <li>우하단 핸들로 <strong>크기</strong>를 조절합니다.</li>
+            <li>상단 핸들로 도형을 <strong>회전</strong>합니다.</li>
+          </ul>
+        </div>
+      </div>
+    </aside>
+    
+    <!-- 사이드바 접기/펼치기 버튼 (외부 배치) -->
+    <button id="btn-toggle-left" class="sidebar-toggle-btn left" aria-label="Toggle Left Sidebar">◄</button>
+
+    <!-- Center Container (가운데 전체 영역 래퍼) -->
+    <div class="center-container">
+      <!-- Canvas Area -->
+      <main class="canvas-area">
+        <!-- JointJS Paper가 마운트되는 영역 -->
+        <div id="paper-container"></div>
+      </main>
+      
+      <!-- 하단 플로팅 툴바 (스크롤 밖 격리) -->
+      <div class="canvas-toolbar">
+        <div class="toolbar-section size-info">
+          <span style="font-size: 1rem;">📐</span>
+          <span id="canvas-size-display" style="font-family: monospace; font-size: 0.85rem;">가로: 0px / 세로: 0px</span>
+        </div>
+        <div class="toolbar-divider"></div>
+        <div class="toolbar-section zoom-controls">
+          <button id="btn-zoom-out" class="toolbar-btn" title="축소">-</button>
+          <span id="zoom-level-display" class="zoom-text">100%</span>
+          <button id="btn-zoom-in" class="toolbar-btn" title="확대">+</button>
+          <button id="btn-zoom-reset" class="toolbar-btn reset-btn" title="100% 초기화">Reset</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 우측 패널 접기/펼치기 버튼 (외부 배치) -->
+    <button id="btn-toggle-right" class="sidebar-toggle-btn right" aria-label="Toggle Right Sidebar">►</button>
+
+    <!-- Output Panel -->
+    <aside class="output-panel">
+      <h2 class="section-title">데이터 결과</h2>
+      <div class="json-box-container">
+        <pre id="json-output">// 저장 버튼을 누르면여기에 구조화된 JSON 데이터가 표시됩니다.</pre>
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- 테이블 상세 정보 모달 (div 팝업) -->
+  <div id="detail-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>📋 테이블 상세 정보 편집</h3>
+        <button id="btn-modal-close" class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="input-table-name">테이블명</label>
+            <input type="text" id="input-table-name" placeholder="테이블명 입력">
+          </div>
+          <div class="form-group">
+            <label for="input-capacity">최대 수용 인원수</label>
+            <input type="number" id="input-capacity" min="1" placeholder="인원수 입력">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="input-x">X 좌표</label>
+            <input type="number" id="input-x" placeholder="X">
+          </div>
+          <div class="form-group">
+            <label for="input-y">Y 좌표</label>
+            <input type="number" id="input-y" placeholder="Y">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="input-width">가로 크기 (Width)</label>
+            <input type="number" id="input-width" min="10" placeholder="가로">
+          </div>
+          <div class="form-group">
+            <label for="input-height">세로 크기 (Height)</label>
+            <input type="number" id="input-height" min="10" placeholder="세로">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="input-angle">회전 각도 (Angle)</label>
+            <input type="number" id="input-angle" min="0" max="360" placeholder="도">
+          </div>
+          <div class="form-group">
+            <label for="input-zindex">우선순위 (Z)</label>
+            <input type="number" id="input-zindex" placeholder="Z-Index">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="input-note1">비고 1</label>
+          <input type="text" id="input-note1" placeholder="비고 1 입력">
+        </div>
+        <div class="form-group">
+          <label for="input-note2">비고 2</label>
+          <input type="text" id="input-note2" placeholder="비고 2 입력">
+        </div>
+        <div class="form-group">
+          <label for="input-note3">비고 3</label>
+          <input type="text" id="input-note3" placeholder="비고 3 입력">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="btn-modal-cancel" class="btn">취소</button>
+        <button id="btn-modal-apply" class="btn btn-emerald">적용하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 의존성 외부 CDN 라이브러리들 (JointJS Core 필수 종속성 순서) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.13.6/underscore-min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.4.1/backbone-min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jointjs/3.7.7/joint.min.js"></script>
+  
+  <!-- TOAST UI DatePicker JS -->
+  <script src="https://uicdn.toast.com/tui.date-picker/latest/tui-date-picker.js"></script>
+  
+  <!-- FullCalendar v5 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+  
+  <!-- Custom Logic -->
+  <script src="app.js"></script>
+</body>
+</html>
