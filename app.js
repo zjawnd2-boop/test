@@ -491,6 +491,45 @@ document.addEventListener('DOMContentLoaded', () => {
   setTimeout(resizePaper, 100);
   resetHistory(); // 최초 로딩 히스토리 리셋 (되돌리기 불가 기준점 확보)
 
+  // ───────────────────────────────────────────────────────────
+  // SVG 패턴 주입: 사각형 도형 내부에만 테이블 이미지 배경 노출
+  // patternUnits="objectBoundingBox" → 패턴이 각 도형의 경계 안에만 렌더링됨
+  // ───────────────────────────────────────────────────────────
+  (function injectTableBgPattern() {
+    const svgEl = paper.svg;
+    let defs = svgEl.querySelector('defs');
+    if (!defs) {
+      defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+      svgEl.insertBefore(defs, svgEl.firstChild);
+    }
+    // 기존에 이미 주입된 경우 중복 삽입 방지
+    if (defs.querySelector('#table-bg-pattern')) return;
+
+    const NS = 'http://www.w3.org/2000/svg';
+    const pattern = document.createElementNS(NS, 'pattern');
+    pattern.setAttribute('id', 'table-bg-pattern');
+    // objectBoundingBox: 좌표계가 도형 경계(0~1) 기준으로 설정됨
+    pattern.setAttribute('patternUnits', 'objectBoundingBox');
+    // patternContentUnits도 objectBoundingBox로 설정해야
+    // <image width="1" height="1"> 이 "도형 전체 크기"로 해석됨
+    pattern.setAttribute('patternContentUnits', 'objectBoundingBox');
+    pattern.setAttribute('width', '1');
+    pattern.setAttribute('height', '1');
+
+    const img = document.createElementNS(NS, 'image');
+    img.setAttributeNS('http://www.w3.org/1999/xlink', 'href', './table-illust-bg.png');
+    img.setAttribute('href', './table-illust-bg.png'); // 현대 브라우저 호환
+    img.setAttribute('x', '0');
+    img.setAttribute('y', '0');
+    // objectBoundingBox 좌표계에서 width/height=1 → 도형 전체 맞춤
+    img.setAttribute('width', '1');
+    img.setAttribute('height', '1');
+    img.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+
+    pattern.appendChild(img);
+    defs.appendChild(pattern);
+  })();
+
   // 도형 외곽선 강조 토글 함수
   function highlightElement(el, highlight) {
     const body = el.attr('body');
@@ -1503,7 +1542,8 @@ document.addEventListener('DOMContentLoaded', () => {
     rect.resize(100, 100);
     rect.attr({
       body: {
-        fill: 'rgba(6, 182, 212, 0.15)', // Cyan
+        // 테이블 이미지를 SVG 패턴으로 채움 (도형 경계 내부에만 표시)
+        fill: 'url(#table-bg-pattern)',
         stroke: '#06b6d4',
         strokeWidth: 2,
         rx: 8,
@@ -1511,10 +1551,14 @@ document.addEventListener('DOMContentLoaded', () => {
       },
       label: {
         text: tableName,
-        fill: '#f8fafc',
-        fontSize: 12,
+        fill: '#ffffff',
+        fontSize: 13,
         fontFamily: 'Inter',
-        fontWeight: '500'
+        fontWeight: '700',
+        // 어두운 외곽선으로 밝은 배경에서도 흰 글자가 선명하게 보이도록
+        stroke: '#0d1321',
+        strokeWidth: 3,
+        paintOrder: 'stroke fill' // stroke를 fill 아래에 렌더링하는 SVG 트릭
       }
     });
 

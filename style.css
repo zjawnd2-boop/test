@@ -127,8 +127,14 @@ header {
 
 .tool-group {
   display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+  flex-direction: row;
+  gap: 0.5rem;
+}
+
+.tool-group .btn {
+  flex: 1;
+  justify-content: center;
+  padding: 0.85rem 0;
 }
 
 /* Controls & Buttons */
@@ -348,8 +354,7 @@ pre {
 
 .tips-box strong {
   color: var(--text-main);
-  display: block;
-  margin-bottom: 0.25rem;
+  display: inline;
 }
 
 .tips-box ul {
@@ -1101,4 +1106,43 @@ pre {
   text-align: center;
   color: var(--accent-cyan);
   font-weight: 600;
+}
+
+/* Space Panning grab cursor override rules */
+.canvas-area.grab-mode,
+.canvas-area.grab-mode * {
+  cursor: grab !important;
+}
+.canvas-area.grabbing-mode,
+.canvas-area.grabbing-mode * {
+  cursor: grabbing !important;
+}
+
+/* Keyboard Shortcut KBD tags styling */
+kbd {
+  background-color: #1e293b;
+  border: 1px solid #475569;
+  border-radius: 4px;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.2), inset 0 0 0 1px #ffffff10;
+  color: #f8fafc;
+  display: inline-block;
+  font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  font-size: 0.7rem;
+  font-weight: 600;
+  line-height: 1.2;
+  padding: 2px 5px;
+  white-space: nowrap;
+}
+
+/* Tips tab button hover/active effects */
+.tips-tab-btn {
+  transition: all 0.2s ease;
+}
+.tips-tab-btn:hover {
+  color: var(--accent-cyan) !important;
+}
+.tips-tab-btn.active {
+  color: var(--accent-cyan) !important;
+  font-weight: bold !important;
+  border-bottom: 2px solid var(--accent-cyan) !important;
 }

@@ -311,3 +311,12 @@
   - `style.css` [MODIFY]: 단추들이 사이드바 밖에서 떠돌도록 `left: 320px`, `right: 320px` 절대 배치를 잡고, 접힐 때 `.collapsed`에 맞춰 `left: 0`, `right: 0`으로 트랜지션 이동하도록 스타일 개편.
   - `app.js` [MODIFY]: 단추 클릭 시 단추 자체에도 `collapsed` 클래스를 연동 토글하도록 보완.
 - **발생한 오류 및 해결 방법**: 없음. 클리핑 현상 원천 봉쇄 및 위치 자동 추종 애니메이션 구현 완료.
+
+### 2026-07-21 20:25:00 (KST)
+- **프롬프트 요청 요약**: 테이블 레이아웃 설정 화면 내 사각형 테이블 객체 UI 개선 — 단순 사각형 박스 대신 테이블(식탁) 모양 아이콘으로 교체하여 시각적 인지성 향상.
+- **수정/생성된 파일명 및 주요 변경 사항**:
+  - `app.js` [MODIFY]:
+    1. `joint.dia.Element.define()`을 활용한 커스텀 도형 클래스 `TableRectShape` 신규 정의. SVG markup에 히트 영역(hitArea), 상단 의자 좌/우(chairTopLeft·chairTopRight), 하단 의자 좌/우(chairBotLeft·chairBotRight), 테이블 몸체(tableBody), 라벨(label) 총 7개 요소를 선언. 모든 좌표 및 크기에 `calc(N * w)` / `calc(N * h)` 형식의 ref 퍼센트 공식을 적용하여 도형 리사이즈 시 의자·테이블 비율이 자동으로 유지되도록 구현.
+    2. `createRectangle()` 함수를 기존 `joint.shapes.standard.Rectangle` 대신 `TableRectShape` 인스턴스를 생성하도록 교체. 기본 크기를 100×100에서 120×100으로 조정. `label/text` 업데이트 방식은 기존과 동일(selector 이름 `label` 공유).
+    3. `highlightElement()` 함수를 수정하여 `tableType === 'Rectangle'`인 도형은 `tableBody` selector에, 나머지 standard 도형은 기존 `body` selector에 강조 스타일을 적용하도록 분기 처리. 다중 선택 amber 점선 강조 이펙트가 TableRectShape에서도 정상 동작하도록 완벽 지원.
+- **발생한 오류 및 해결 방법**: 없음. 커스텀 도형 클래스 정의·createRectangle 교체·highlightElement selector 분기 처리 3단계 수정을 통해 사각형 테이블 아이콘 UI 개선 완벽 구현 완료.

@@ -60,35 +60,31 @@
         <h2 class="section-title">도형 추가</h2>
         <div class="tool-group">
           <!-- 사각형 추가 버튼 -->
-          <button id="add-rect" class="btn btn-cyan">
+          <button id="add-rect" class="btn btn-cyan" title="사각형 추가">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6z"></path>
+              <rect x="4" y="4" width="16" height="16" stroke="currentColor" stroke-width="2"></rect>
             </svg>
-            사각형 추가
           </button>
           
           <!-- 원형 추가 버튼 -->
-          <button id="add-circle" class="btn btn-purple">
+          <button id="add-circle" class="btn btn-purple" title="원형 추가">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="2"></circle>
             </svg>
-            원형 추가
           </button>
           
           <!-- 삼각형 추가 버튼 -->
-          <button id="add-triangle" class="btn btn-emerald">
+          <button id="add-triangle" class="btn btn-emerald" title="삼각형 추가">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4l8 16H4L12 4z"></path>
             </svg>
-            삼각형 추가
           </button>
-
+ 
           <!-- 마름모 추가 버튼 -->
-          <button id="add-diamond" class="btn btn-cyan">
+          <button id="add-diamond" class="btn btn-cyan" title="마름모 추가">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3l8 9-8 9-8-9 8-9z"></path>
             </svg>
-            마름모 추가
           </button>
         </div>
 
@@ -113,19 +109,39 @@
         <!-- Quick Tips -->
         <div class="tips-box">
           <div class="tips-header" id="tips-toggle-btn" style="cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none;">
-            <strong>💡 도움말</strong>
+            <strong>💡 도움말 & 단축키</strong>
             <span class="tips-toggle-icon" style="font-size: 0.75rem; transition: transform 0.2s;">▼</span>
           </div>
-          <ul id="tips-content" style="margin-top: 0.5rem; display: block; padding-left: 0; margin-bottom: 0;">
-            <li>도형을 클릭하면 <strong>조작 테두리</strong>가 나타납니다.</li>
-            <li>도형을 드래그하여 배치합니다.</li>
-            <li>도형을 <strong>더블 클릭</strong>하면 상세 정보 및 우선순위(Z) 편집 팝업이 뜹니다.</li>
-            <li>빈 영역 드래그 또는 Shift+클릭 후 <strong>그룹화(🔗)</strong>가 가능합니다.</li>
-            <li>그룹 도형 선택 시 오버레이의 <strong>그룹 해제(🔓)</strong> 단추로 해제합니다.</li>
-            <li>우상단 <strong>X</strong> 버튼으로 도형을 삭제합니다.</li>
-            <li>우하단 핸들로 <strong>크기</strong>를 조절합니다.</li>
-            <li>상단 핸들로 도형을 <strong>회전</strong>합니다.</li>
-          </ul>
+          <div id="tips-body" style="display: block;">
+            <!-- 탭 버튼 영역 -->
+            <div class="tips-tab-buttons" style="display: flex; gap: 0.5rem; margin-top: 0.6rem; margin-bottom: 0.4rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.4rem; user-select: none;">
+              <button class="tips-tab-btn active" data-tab="basic" style="background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.75rem; padding: 2px 4px 4px 4px; font-family: 'Inter', sans-serif;">기본 조작</button>
+              <button class="tips-tab-btn" data-tab="shortcuts" style="background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.75rem; padding: 2px 4px 4px 4px; font-family: 'Inter', sans-serif;">단축키</button>
+            </div>
+            
+            <!-- 기본 조작 탭 내용 -->
+            <ul id="tips-basic-content" class="tips-list" style="margin-top: 0.5rem; display: block; padding-left: 0; margin-bottom: 0; list-style: none;">
+              <li>클릭 시 <strong>조작 테두리</strong> 활성화</li>
+              <li>도형을 드래그하여 배치 이동</li>
+              <li><strong>더블클릭</strong> 시 상세 속성 편집</li>
+              <li>빈 공간 드래그 / Shift+클릭: <strong>다중 선택</strong></li>
+              <li>다중 선택 후 툴바에서 <strong>그룹화(🔗)</strong> 가능</li>
+              <li>그룹 선택 후 오버레이에서 <strong>그룹 해제(🔓)</strong> 가능</li>
+              <li>오버레이 우상단 <strong>X</strong> 단추로 도형 삭제</li>
+              <li>우하단 핸들로 <strong>크기 조절</strong> (Shift: 비율 고정)</li>
+              <li>상단 핸들로 <strong>회전 조절</strong> (Shift: 45도 스냅)</li>
+            </ul>
+ 
+            <!-- 단축키 탭 내용 -->
+            <ul id="tips-shortcuts-content" class="tips-list" style="margin-top: 0.5rem; display: none; padding-left: 0; margin-bottom: 0; list-style: none;">
+              <li><kbd>Delete</kbd> : 선택한 도형 삭제 (확인창)</li>
+              <li><kbd>Ctrl + Z</kbd> : 실행 취소 (되돌리기)</li>
+              <li><kbd>Ctrl + Y</kbd> : 재실행 (다시 실행)</li>
+              <li><kbd>Space</kbd> + 드래그 : 화면 스크롤 Panning</li>
+              <li><kbd>Ctrl + G</kbd> : 선택한 도형들 그룹화</li>
+              <li><kbd>Ctrl + Shift + G</kbd> : 선택한 그룹 해제</li>
+            </ul>
+          </div>
         </div>
       </div>
     </aside>
