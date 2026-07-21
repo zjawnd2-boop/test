@@ -609,7 +609,7 @@ document.addEventListener('DOMContentLoaded', () => {
   selectionToolbar.className = 'selection-toolbar';
   selectionToolbar.innerHTML = `
     <button id="btn-selection-group" class="btn btn-purple" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; box-shadow: 0 4px 12px rgba(168, 85, 247, 0.4);">🔗 그룹화</button>
-    <button id="btn-selection-delete" class="btn btn-red" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4); margin-left: 0.5rem;">🗑️ 삭제</button>
+    <button id="btn-selection-delete" class="btn btn-red" style="padding: 0.4rem 0.8rem; font-size: 0.8rem; box-shadow: 0 4px 68px rgba(239, 68, 68, 0.4); margin-left: 0.5rem;">🗑️ 삭제</button>
   `;
   paperContainer.appendChild(selectionToolbar);
 
@@ -1901,6 +1901,54 @@ document.addEventListener('DOMContentLoaded', () => {
   // 초기 로드시 목록 렌더링
   renderSavedLayouts();
 
+  // 도움말 접기/펼기 이벤트 연결
+  const tipsToggleBtn = document.getElementById('tips-toggle-btn');
+  const tipsContent = document.getElementById('tips-body'); // HTML ID: tips-body
+  const tipsToggleIcon = tipsToggleBtn ? tipsToggleBtn.querySelector('.tips-toggle-icon') : null;
+
+  if (tipsToggleBtn && tipsContent) {
+    tipsToggleBtn.addEventListener('click', () => {
+      const isCollapsed = tipsContent.style.display === 'none';
+      tipsContent.style.display = isCollapsed ? 'block' : 'none';
+      if (tipsToggleIcon) {
+        tipsToggleIcon.style.transform = isCollapsed ? 'rotate(0deg)' : 'rotate(-90deg)';
+      }
+    });
+  }
+
+  // 도움말 탭 전환 로직 (기본 조작 / 단축키)
+  const tipsTabBtns = document.querySelectorAll('.tips-tab-btn');
+  const tipsBasicContent = document.getElementById('tips-basic-content');
+  const tipsShortcutsContent = document.getElementById('tips-shortcuts-content');
+
+  tipsTabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetTab = btn.dataset.tab;
+
+      // 모든 탭 비활성화
+      tipsTabBtns.forEach(b => {
+        b.style.color = 'var(--text-muted)';
+        b.style.fontWeight = 'normal';
+        b.style.borderBottom = 'none';
+      });
+      // 선택된 탭 활성화
+      btn.style.color = 'var(--accent-cyan)';
+      btn.style.fontWeight = '600';
+      btn.style.borderBottom = '2px solid var(--accent-cyan)';
+
+      // 콘텐츠 전환
+      if (tipsBasicContent) tipsBasicContent.style.display = targetTab === 'basic' ? 'block' : 'none';
+      if (tipsShortcutsContent) tipsShortcutsContent.style.display = targetTab === 'shortcuts' ? 'block' : 'none';
+    });
+  });
+
+  // 초기에 첫 번째 탭 활성화 상태 적용
+  const activeTab = document.querySelector('.tips-tab-btn.active');
+  if (activeTab) {
+    activeTab.style.color = 'var(--accent-cyan)';
+    activeTab.style.fontWeight = '600';
+  }
+
   saveBtn.addEventListener('click', () => {
     const layoutNameInput = prompt('저장할 레이아웃 이름을 입력해 주세요:');
     if (!layoutNameInput) {
@@ -1989,22 +2037,6 @@ document.addEventListener('DOMContentLoaded', () => {
       saveBtn.style.background = '';
       saveBtn.style.borderColor = '';
     }, 2000);
-  });
-
-  // 도움말 접기/펴기 이벤트 연결
-  const tipsToggleBtn = document.getElementById('tips-toggle-btn');
-  const tipsContent = document.getElementById('tips-content');
-  const tipsToggleIcon = tipsToggleBtn.querySelector('.tips-toggle-icon');
-
-  tipsToggleBtn.addEventListener('click', () => {
-    const isCollapsed = tipsContent.style.display === 'none';
-    if (isCollapsed) {
-      tipsContent.style.display = 'block';
-      tipsToggleIcon.style.transform = 'rotate(0deg)';
-    } else {
-      tipsContent.style.display = 'none';
-      tipsToggleIcon.style.transform = 'rotate(-90deg)';
-    }
   });
 
   // 좌우 사이드바 접기/펼치기 토글 이벤트 연결
