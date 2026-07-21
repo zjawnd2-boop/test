@@ -1925,16 +1925,10 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.addEventListener('click', () => {
       const targetTab = btn.dataset.tab;
 
-      // 모든 탭 비활성화
-      tipsTabBtns.forEach(b => {
-        b.style.color = 'var(--text-muted)';
-        b.style.fontWeight = 'normal';
-        b.style.borderBottom = 'none';
-      });
-      // 선택된 탭 활성화
-      btn.style.color = 'var(--accent-cyan)';
-      btn.style.fontWeight = '600';
-      btn.style.borderBottom = '2px solid var(--accent-cyan)';
+      // 모든 탭 버튼에서 active 클래스 제거
+      tipsTabBtns.forEach(b => b.classList.remove('active'));
+      // 클릭된 탭 버튼에 active 클래스 추가
+      btn.classList.add('active');
 
       // 콘텐츠 전환
       if (tipsBasicContent) tipsBasicContent.style.display = targetTab === 'basic' ? 'block' : 'none';
@@ -1942,12 +1936,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // 초기에 첫 번째 탭 활성화 상태 적용
-  const activeTab = document.querySelector('.tips-tab-btn.active');
-  if (activeTab) {
-    activeTab.style.color = 'var(--accent-cyan)';
-    activeTab.style.fontWeight = '600';
-  }
 
   saveBtn.addEventListener('click', () => {
     const layoutNameInput = prompt('저장할 레이아웃 이름을 입력해 주세요:');
