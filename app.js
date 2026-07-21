@@ -401,15 +401,15 @@ document.addEventListener('DOMContentLoaded', () => {
       const y = shapeData.position.y;
 
       if (shapeData.tableType === 'Rectangle') {
-        shape = createRectangle(x, y);
+        shape = createRectangle(x, y, shapeData.id);
       } else if (shapeData.tableType === 'Ellipse') {
-        shape = createCircle(x, y);
+        shape = createCircle(x, y, shapeData.id);
       } else if (shapeData.tableType === 'Triangle') {
-        shape = createTriangle(x, y);
+        shape = createTriangle(x, y, shapeData.id);
       } else if (shapeData.tableType === 'Diamond') {
-        shape = createDiamond(x, y);
+        shape = createDiamond(x, y, shapeData.id);
       } else if (shapeData.tableType === 'Group') {
-        shape = createGroup(x, y, shapeData.size.width, shapeData.size.height, shapeData.tableName);
+        shape = createGroup(x, y, shapeData.size.width, shapeData.size.height, shapeData.tableName, shapeData.id);
       }
 
       if (shape) {
@@ -437,6 +437,13 @@ document.addEventListener('DOMContentLoaded', () => {
     shapes.forEach(shapeData => {
       if (shapeData.parent && idMap[shapeData.parent] && idMap[shapeData.id]) {
         idMap[shapeData.parent].embed(idMap[shapeData.id]);
+      }
+    });
+
+    // 3.5단계: embed 이후 자식 도형들의 절대 좌표를 다시 한 번 원래 좌표로 보정
+    shapes.forEach(shapeData => {
+      if (shapeData.parent && idMap[shapeData.id]) {
+        idMap[shapeData.id].position(shapeData.position.x, shapeData.position.y);
       }
     });
 
@@ -814,12 +821,15 @@ document.addEventListener('DOMContentLoaded', () => {
         e.stopPropagation();
         e.preventDefault();
         if (confirm(`"${selectedElement.get('tableName')}" 그룹을 해제하시겠습니까?`)) {
+          isUndoRedoAction = true;
           const children = selectedElement.getEmbeddedCells();
           children.forEach(child => {
             selectedElement.unembed(child);
           });
           selectedElement.remove();
           removeTransformOverlay();
+          isUndoRedoAction = false;
+          pushState();
         }
       });
     }
@@ -1072,8 +1082,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
   // 그룹 도형 생성 함수
-  function createGroup(x, y, w, h, name) {
-    const group = new joint.shapes.standard.Rectangle();
+  function createGroup(x, y, w, h, name = null, id = null) {
+    const group = new joint.shapes.standard.Rectangle(id ? { id } : {});
     const gName = name || `그룹-${groupCounter++}`;
     group.position(x, y);
     group.resize(w, h);
@@ -1112,6 +1122,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function groupSelectedElements() {
     if (selectedElements.length < 2) return;
 
+    isUndoRedoAction = true; // 중간 add 이벤트 발생 시 빈 그룹 스냅샷 자동 저장 방지
+
     // 바운딩 박스 계산
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
     selectedElements.forEach(el => {
@@ -1140,6 +1152,9 @@ document.addEventListener('DOMContentLoaded', () => {
     selectedElements = [];
     updateSelectionToolbar();
     createTransformOverlay(groupEl);
+
+    isUndoRedoAction = false;
+    pushState(); // 그룹화 완료 최종 상태 1건만 저장
   }
 
   // 플로팅 툴바 내부 그룹화 버튼 이벤트 바인딩
@@ -1535,9 +1550,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 5. 도형 생성 함수 재구성
   // 사각형 생성
-  function createRectangle(x, y) {
-    const rect = new joint.shapes.standard.Rectangle();
-    const tableName = `사각형-${shapeCounter++}`;
+  function createRectangle(x, y, id = null) {
+    const rect = new joint.shapes.standard.Rectangle(id ? { id } : {});
+    const tableName = id ? '' : `사각형-${shapeCounter++}`;
     rect.position(x, y);
     rect.resize(100, 100);
     rect.attr({
@@ -1569,14 +1584,16 @@ document.addEventListener('DOMContentLoaded', () => {
     rect.set('note2', '');
     rect.set('note3', '');
     rect.addTo(graph);
-    createTransformOverlay(rect); // 생성 직후 선택 처리
+    if (!id && !isUndoRedoAction) {
+      createTransformOverlay(rect);
+    }
     return rect;
   }
 
   // 원/타원형 생성
-  function createCircle(x, y) {
-    const ellipse = new joint.shapes.standard.Ellipse();
-    const tableName = `원형-${shapeCounter++}`;
+  function createCircle(x, y, id = null) {
+    const ellipse = new joint.shapes.standard.Ellipse(id ? { id } : {});
+    const tableName = id ? '' : `원형-${shapeCounter++}`;
     ellipse.position(x, y);
     ellipse.resize(100, 100);
     ellipse.attr({
@@ -1601,14 +1618,16 @@ document.addEventListener('DOMContentLoaded', () => {
     ellipse.set('note2', '');
     ellipse.set('note3', '');
     ellipse.addTo(graph);
-    createTransformOverlay(ellipse); // 생성 직후 선택 처리
+    if (!id && !isUndoRedoAction) {
+      createTransformOverlay(ellipse);
+    }
     return ellipse;
   }
 
   // 삼각형 생성 (Polygon standard shape 이용)
-  function createTriangle(x, y) {
-    const triangle = new joint.shapes.standard.Polygon();
-    const tableName = `삼각형-${shapeCounter++}`;
+  function createTriangle(x, y, id = null) {
+    const triangle = new joint.shapes.standard.Polygon(id ? { id } : {});
+    const tableName = id ? '' : `삼각형-${shapeCounter++}`;
     triangle.position(x, y);
     triangle.resize(100, 100);
     triangle.attr({
@@ -1635,14 +1654,16 @@ document.addEventListener('DOMContentLoaded', () => {
     triangle.set('note2', '');
     triangle.set('note3', '');
     triangle.addTo(graph);
-    createTransformOverlay(triangle);
+    if (!id && !isUndoRedoAction) {
+      createTransformOverlay(triangle);
+    }
     return triangle;
   }
 
   // 마름모 생성 (Polygon standard shape 이용)
-  function createDiamond(x, y) {
-    const diamond = new joint.shapes.standard.Polygon();
-    const tableName = `마름모-${shapeCounter++}`;
+  function createDiamond(x, y, id = null) {
+    const diamond = new joint.shapes.standard.Polygon(id ? { id } : {});
+    const tableName = id ? '' : `마름모-${shapeCounter++}`;
     diamond.position(x, y);
     diamond.resize(100, 100);
     diamond.attr({
@@ -1668,7 +1689,9 @@ document.addEventListener('DOMContentLoaded', () => {
     diamond.set('note2', '');
     diamond.set('note3', '');
     diamond.addTo(graph);
-    createTransformOverlay(diamond);
+    if (!id && !isUndoRedoAction) {
+      createTransformOverlay(diamond);
+    }
     return diamond;
   }
 
@@ -2110,12 +2133,14 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       if (selectedElement && selectedElement.get('tableType') === 'Group') {
         if (confirm(`"${selectedElement.get('tableName')}" 그룹을 해제하시겠습니까?`)) {
+          isUndoRedoAction = true;
           const children = selectedElement.getEmbeddedCells();
           children.forEach(child => {
             selectedElement.unembed(child);
           });
           selectedElement.remove();
           removeTransformOverlay();
+          isUndoRedoAction = false;
           pushState();
         }
       }
