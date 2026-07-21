@@ -2105,12 +2105,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const isCtrl = e.ctrlKey || e.metaKey;
 
-    if (isCtrl && e.key.toLowerCase() === 'z') {
+    if (isCtrl && e.shiftKey && e.key.toLowerCase() === 'g') {
+      // Ctrl + Shift + G (선택한 그룹 해제)
+      e.preventDefault();
+      if (selectedElement && selectedElement.get('tableType') === 'Group') {
+        if (confirm(`"${selectedElement.get('tableName')}" 그룹을 해제하시겠습니까?`)) {
+          const children = selectedElement.getEmbeddedCells();
+          children.forEach(child => {
+            selectedElement.unembed(child);
+          });
+          selectedElement.remove();
+          removeTransformOverlay();
+          pushState();
+        }
+      }
+    } else if (isCtrl && e.key.toLowerCase() === 'g') {
+      // Ctrl + G (선택한 도형들 그룹화)
+      e.preventDefault();
+      if (selectedElements && selectedElements.length >= 2) {
+        groupSelectedElements();
+      }
+    } else if (isCtrl && e.key.toLowerCase() === 'z') {
       // Ctrl + Z (되돌리기)
       e.preventDefault();
       undo();
     } else if (isCtrl && e.key.toLowerCase() === 'y') {
-      // Ctrl + Y (앞으로 돌리기)
+      // Ctrl + Y (재실행)
       e.preventDefault();
       redo();
     } else if (e.key === 'Delete') {
